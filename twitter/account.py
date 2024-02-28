@@ -51,6 +51,8 @@ class Account:
             'features': features,
             'variables': Operation.default_variables | variables
         }
+        if self.proxies:
+            self.session.proxies.update(self.proxies)
         if method == 'POST':
             data = {'json': params}
         else:
