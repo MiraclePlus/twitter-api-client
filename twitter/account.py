@@ -42,7 +42,7 @@ class Account:
         self.v2_api = 'https://twitter.com/i/api/2'
         self.logger = self._init_logger(**kwargs)
         self.proxies = proxies
-        self.session = self._validate_session(email, username, password, session, proxies=proxies, **kwargs)
+        self.session = self._validate_session(email, username, password, session, proxies, **kwargs)
 
     def gql(self, method: str, operation: tuple, variables: dict, features: dict = Operation.default_features) -> dict:
         qid, op = operation
@@ -51,8 +51,6 @@ class Account:
             'features': features,
             'variables': Operation.default_variables | variables
         }
-        if self.proxies:
-            self.session.proxies.update(self.proxies)
         if method == 'POST':
             data = {'json': params}
         else:
@@ -617,7 +615,7 @@ class Account:
 
     @staticmethod
     def _validate_session(*args, **kwargs):
-        email, username, password, session = args
+        email, username, password, session, proxies = args
 
         # validate credentials
         if all((email, username, password)):
@@ -635,14 +633,14 @@ class Account:
 
         # try validating cookies dict
         if isinstance(cookies, dict) and all(cookies.get(c) for c in {'ct0', 'auth_token'}):
-            _session = Client(cookies=cookies, follow_redirects=True)
+            _session = Client(cookies=cookies, follow_redirects=True, proxies=proxies)
             _session._init_with_cookies = True
             _session.headers.update(get_headers(_session))
             return _session
 
         # try validating cookies from file
         if isinstance(cookies, str):
-            _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True)
+            _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True, proxies=proxies)
             _session._init_with_cookies = True
             _session.headers.update(get_headers(_session))
             return _session
