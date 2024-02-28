@@ -1,5 +1,5 @@
 ## 修改
-* 这里只是给这个项目的scraper部分添加了代理。
+* 这里只是给这个项目的scraper 和 account部分添加了代理。
 
 ## Implementation of X/Twitter v1, v2, and GraphQL APIs
 
